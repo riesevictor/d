@@ -124,6 +124,7 @@
             --card-border: rgba(255, 255, 255, 0.18); --text-main: #f4f4f4; --text-muted: #9a9a9a;
             --accent: #f1f1f1; --accent-strong: #8e8e8e; --accent-soft: rgba(255,255,255,0.08);
             --theme-font: 'Impact', 'Haettenschweiler', 'Arial Narrow Bold', 'Trebuchet MS', sans-serif;
+<<<<<<< codex/create-special-opiumcore-theme-ln96ik
             --ui-radius: 3px;
             --button-radius: 0px;
             --app-width: 1540;
@@ -142,6 +143,10 @@
         html[data-theme="opiumcore"] .logo-dot { border-radius: 0; transform: rotate(45deg); }
         html[data-theme="opiumcore"] button { text-transform: uppercase; letter-spacing: 0.08em; }
 
+=======
+        }
+
+>>>>>>> main
 
 
 
@@ -567,7 +572,11 @@
 
 
                     <div class="upload-zone" id="uploadZone">
+<<<<<<< codex/create-special-opiumcore-theme-ln96ik
                         <div id="uploadIcon" style="font-size: 2.8rem;">📁</div>
+=======
+                        <div style="font-size: 2.8rem;">📁</div>
+>>>>>>> main
                         <h3 style="margin-top: 8px;">Drop ROM Files Here</h3>
                         <p class="muted space">or</p>
                         <input type="file" id="input" hidden>
@@ -713,7 +722,10 @@
             document.documentElement.setAttribute('data-theme', themeName);
             document.getElementById('themePicker').value = themeName;
             localStorage.setItem('nexemu_theme', themeName);
+<<<<<<< codex/create-special-opiumcore-theme-ln96ik
             applyThemeSpecificDecor(themeName);
+=======
+>>>>>>> main
         }
 
 
@@ -734,6 +746,7 @@
 
 
 
+<<<<<<< codex/create-special-opiumcore-theme-ln96ik
 
         function applyThemeSpecificDecor(themeName) {
             const isOpiumcore = themeName === OPIUMCORE_THEME;
@@ -757,6 +770,8 @@
 
 
 
+=======
+>>>>>>> main
         function startSessionTimer() {
             if (!sessionStart) sessionStart = Date.now();
             clearInterval(sessionTimerId);
@@ -836,6 +851,7 @@
 
 
 
+<<<<<<< codex/create-special-opiumcore-theme-ln96ik
             const activeTheme = document.documentElement.getAttribute('data-theme');
             const lockShapeForOpiumcore = activeTheme === OPIUMCORE_THEME;
 
@@ -844,12 +860,20 @@
             document.documentElement.style.setProperty('--ui-font', fontFamily);
             document.documentElement.style.setProperty('--ui-scale', String(uiScale));
             document.documentElement.style.setProperty('--app-width', lockShapeForOpiumcore ? '1540' : String(appWidth));
+=======
+            document.documentElement.style.setProperty('--ui-radius', `${radius}px`);
+            document.documentElement.style.setProperty('--button-radius', `${buttonShape}px`);
+            document.documentElement.style.setProperty('--ui-font', fontFamily);
+            document.documentElement.style.setProperty('--ui-scale', String(uiScale));
+            document.documentElement.style.setProperty('--app-width', String(appWidth));
+>>>>>>> main
             document.body.classList.remove('density-comfortable', 'density-compact', 'density-condensed');
             document.body.classList.add(`density-${density}`);
 
 
 
 
+<<<<<<< codex/create-special-opiumcore-theme-ln96ik
             cornerRadiusSlider.value = String(lockShapeForOpiumcore ? 3 : radius);
             cornerRadiusValue.textContent = `${lockShapeForOpiumcore ? 3 : radius}px`;
             buttonShapePicker.value = lockShapeForOpiumcore ? '0' : buttonShape;
@@ -858,6 +882,16 @@
             uiScaleValue.textContent = `${uiScale}%`;
             layoutWidthSlider.value = String(lockShapeForOpiumcore ? 1540 : appWidth);
             layoutWidthValue.textContent = `${lockShapeForOpiumcore ? 1540 : appWidth}px`;
+=======
+            cornerRadiusSlider.value = String(radius);
+            cornerRadiusValue.textContent = `${radius}px`;
+            buttonShapePicker.value = buttonShape;
+            fontPicker.value = fontFamily;
+            uiScaleSlider.value = String(uiScale);
+            uiScaleValue.textContent = `${uiScale}%`;
+            layoutWidthSlider.value = String(appWidth);
+            layoutWidthValue.textContent = `${appWidth}px`;
+>>>>>>> main
             [cornerRadiusSlider, uiScaleSlider, layoutWidthSlider].forEach(updateRangeVisual);
             densityPicker.value = density;
             if (settingsOpen !== null) customizationPanel.open = settingsOpen === 'true';
@@ -1033,7 +1067,10 @@
                 return;
             }
             setTheme(requestedTheme);
+<<<<<<< codex/create-special-opiumcore-theme-ln96ik
             applyCustomizationSettings();
+=======
+>>>>>>> main
         });
 
 
@@ -1071,12 +1108,15 @@
 
 
         cornerRadiusSlider.addEventListener('input', (e) => {
+<<<<<<< codex/create-special-opiumcore-theme-ln96ik
             if (document.documentElement.getAttribute('data-theme') === OPIUMCORE_THEME) {
                 e.target.value = '3';
                 cornerRadiusValue.textContent = '3px';
                 updateRangeVisual(e.target);
                 return;
             }
+=======
+>>>>>>> main
             const radius = Number(e.target.value);
             document.documentElement.style.setProperty('--ui-radius', `${radius}px`);
             cornerRadiusValue.textContent = `${radius}px`;
@@ -1088,11 +1128,14 @@
 
 
         buttonShapePicker.addEventListener('change', (e) => {
+<<<<<<< codex/create-special-opiumcore-theme-ln96ik
             if (document.documentElement.getAttribute('data-theme') === OPIUMCORE_THEME) {
                 e.target.value = '0';
                 document.documentElement.style.setProperty('--button-radius', '0px');
                 return;
             }
+=======
+>>>>>>> main
             document.documentElement.style.setProperty('--button-radius', `${e.target.value}px`);
             localStorage.setItem('nexemu_button_shape', e.target.value);
         });
@@ -1120,6 +1163,7 @@
 
 
         layoutWidthSlider.addEventListener('input', (e) => {
+<<<<<<< codex/create-special-opiumcore-theme-ln96ik
             if (document.documentElement.getAttribute('data-theme') === OPIUMCORE_THEME) {
                 e.target.value = '1540';
                 layoutWidthValue.textContent = '1540px';
@@ -1127,6 +1171,8 @@
                 updateRangeVisual(e.target);
                 return;
             }
+=======
+>>>>>>> main
             const width = Number(e.target.value);
             document.documentElement.style.setProperty('--app-width', String(width));
             layoutWidthValue.textContent = `${width}px`;
