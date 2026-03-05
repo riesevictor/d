@@ -30,6 +30,7 @@
             --ui-radius: 14px;
             --button-radius: 10px;
             --ui-font: 'Trebuchet MS', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --theme-font: var(--ui-font);
             --ui-scale: 100;
             --app-width: 1320;
         }
@@ -118,6 +119,32 @@
 
 
 
+        html[data-theme="opiumcore"] {
+            --bg-main: #080808; --bg-secondary: #121212; --card-bg: rgba(14,14,14,0.92);
+            --card-border: rgba(255, 255, 255, 0.18); --text-main: #f4f4f4; --text-muted: #9a9a9a;
+            --accent: #f1f1f1; --accent-strong: #8e8e8e; --accent-soft: rgba(255,255,255,0.08);
+            --theme-font: 'Impact', 'Haettenschweiler', 'Arial Narrow Bold', 'Trebuchet MS', sans-serif;
+            --ui-radius: 3px;
+            --button-radius: 0px;
+            --app-width: 1540;
+        }
+
+        html[data-theme="opiumcore"] .grid { grid-template-columns: 260px 1fr; gap: 14px; }
+        html[data-theme="opiumcore"] .topbar,
+        html[data-theme="opiumcore"] .panel,
+        html[data-theme="opiumcore"] .card,
+        html[data-theme="opiumcore"] .upload-zone,
+        html[data-theme="opiumcore"] .kbd,
+        html[data-theme="opiumcore"] .recent-item,
+        html[data-theme="opiumcore"] dialog { border-radius: 0; }
+        html[data-theme="opiumcore"] .topbar,
+        html[data-theme="opiumcore"] .panel { box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 20px 40px rgba(0,0,0,0.55); }
+        html[data-theme="opiumcore"] .logo-dot { border-radius: 0; transform: rotate(45deg); }
+        html[data-theme="opiumcore"] button { text-transform: uppercase; letter-spacing: 0.08em; }
+
+
+
+
         @keyframes floatIn {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
@@ -135,7 +162,7 @@
 
 
         body {
-            font-family: var(--ui-font);
+            font-family: var(--theme-font, var(--ui-font));
             font-size: 16px;
             zoom: calc(var(--ui-scale) / 100);
             background: radial-gradient(circle at 10% -20%, color-mix(in srgb, var(--accent) 35%, transparent), transparent 42%),
@@ -445,6 +472,41 @@
 
 
 
+
+
+
+
+
+        #opiumDebugHud {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            width: min(360px, 90vw);
+            max-height: 44vh;
+            overflow: auto;
+            padding: 10px;
+            font-size: 0.78rem;
+            line-height: 1.45;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(3,3,3,0.82);
+            color: #dedede;
+            z-index: 1000;
+            display: none;
+            white-space: pre-wrap;
+        }
+
+        html[data-theme="opiumcore"] body.opiumcore-devmode #opiumDebugHud { display: block; }
+        html[data-theme="opiumcore"] body.opiumcore-devmode {
+            background-image:
+                repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 36px),
+                repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0 1px, transparent 1px 36px),
+                radial-gradient(circle at 10% -20%, color-mix(in srgb, var(--accent) 35%, transparent), transparent 42%),
+                radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--accent-strong) 32%, transparent), transparent 40%),
+                linear-gradient(165deg, var(--bg-main), var(--bg-secondary) 78%);
+        }
+        html[data-theme="opiumcore"] body.opiumcore-devmode .topbar,
+        html[data-theme="opiumcore"] body.opiumcore-devmode .panel { outline: 1px solid rgba(255,255,255,0.18); }
         @media (max-width: 1000px) {
             .grid { grid-template-columns: 1fr; }
             #game { height: 430px; }
@@ -463,6 +525,7 @@
             </div>
             <div class="topbar-actions">
                 <span id="liveClock" class="chip">--:--:--</span>
+                <span id="opiumDevChip" class="chip" style="display:none;">DEV MODE OFF</span>
                 <select id="themePicker" aria-label="Theme Picker">
                     <option value="coral">Coral</option>
                     <option value="sky">Sky</option>
@@ -474,6 +537,7 @@
                     <option value="teal">Teal</option>
                     <option value="indigo">Indigo</option>
                     <option value="rose">Rose</option>
+                    <option value="opiumcore">Opiumcore 🔒</option>
                 </select>
                 <button id="shortcutsBtn" class="ghost">⌨️ Shortcuts</button>
             </div>
@@ -517,6 +581,17 @@
                     </div>
                 </section>
 
+                <section class="card" id="opiumDevCard" style="display:none;">
+                    <h3>Opiumcore Developer Mode</h3>
+                    <p class="muted">Exclusive debug controls for the locked Opiumcore theme.</p>
+                    <div class="row space">
+                        <button id="devModeToggle" class="ghost">Enable Dev Mode</button>
+                        <button id="copyDebug" class="ghost">Copy Diagnostics</button>
+                    </div>
+                    <p id="devModeStatus" class="muted space">Dev mode is off.</p>
+                </section>
+
+
 
 
 
@@ -539,7 +614,7 @@
 
 
                     <div class="upload-zone" id="uploadZone">
-                        <div style="font-size: 2.8rem;">📁</div>
+                        <div id="uploadIcon" style="font-size: 2.8rem;">📁</div>
                         <h3 style="margin-top: 8px;">Drop ROM Files Here</h3>
                         <p class="muted space">or</p>
                         <input type="file" id="input" hidden>
@@ -621,6 +696,8 @@
 
 
 
+    <pre id="opiumDebugHud" aria-live="polite">Debug HUD inactive.</pre>
+
     <dialog id="shortcutsDialog">
         <h3>Keyboard Shortcuts</h3>
         <ul class="space muted">
@@ -629,6 +706,7 @@
             <li><span class="kbd">Alt + Shift + F</span> Toggle fullscreen</li>
             <li><span class="kbd">Alt + Shift + R</span> Reset settings</li>
             <li><span class="kbd">Alt + Shift + N</span> Load new game</li>
+            <li><span class="kbd">Alt + Shift + D</span> Toggle Opiumcore dev mode</li>
             <li><span class="kbd">Esc</span> Close this dialog</li>
         </ul>
         <div class="row space" style="justify-content: flex-end;">
@@ -662,6 +740,16 @@
         const layoutWidthValue = document.getElementById('layoutWidthValue');
         const densityPicker = document.getElementById('densityPicker');
         const customizationPanel = document.getElementById('customizationPanel');
+        const OPIUMCORE_THEME = 'opiumcore';
+        const OPIUMCORE_PASSWORD = '<3^3';
+        const opiumDevCard = document.getElementById('opiumDevCard');
+        const opiumDevChip = document.getElementById('opiumDevChip');
+        const opiumDebugHud = document.getElementById('opiumDebugHud');
+        const devModeToggle = document.getElementById('devModeToggle');
+        const copyDebug = document.getElementById('copyDebug');
+        const devModeStatus = document.getElementById('devModeStatus');
+
+        let opiumDebugTimerId = null;
 
 
 
@@ -683,6 +771,114 @@
             document.documentElement.setAttribute('data-theme', themeName);
             document.getElementById('themePicker').value = themeName;
             localStorage.setItem('nexemu_theme', themeName);
+            applyThemeSpecificDecor(themeName);
+        }
+
+
+
+
+        function unlockOpiumcoreTheme() {
+            const unlocked = localStorage.getItem('nexemu_opiumcore_unlocked') === 'true';
+            if (unlocked) return true;
+            const entered = window.prompt('Opiumcore is locked. Enter the theme password:');
+            if (entered === OPIUMCORE_PASSWORD) {
+                localStorage.setItem('nexemu_opiumcore_unlocked', 'true');
+                return true;
+            }
+            if (entered !== null) window.alert('Wrong password. Opiumcore theme stayed locked.');
+            return false;
+        }
+
+
+
+
+
+        function applyThemeSpecificDecor(themeName) {
+            const isOpiumcore = themeName === OPIUMCORE_THEME;
+            const shortcutsBtn = document.getElementById('shortcutsBtn');
+            const clearRecentBtn = document.getElementById('clearRecent');
+            const fullscreenBtn = document.getElementById('toggleFullscreen');
+            const resetBtn = document.getElementById('resetPrefs');
+            const newGameBtn = document.getElementById('newGame');
+            const uploadBtn = document.getElementById('uploadbutton');
+            const uploadIcon = document.getElementById('uploadIcon');
+
+            shortcutsBtn.textContent = isOpiumcore ? '✦ COMMANDS' : '⌨️ Shortcuts';
+            clearRecentBtn.textContent = isOpiumcore ? '✦ Purge Recent ROMs' : '🗑️ Clear Recent ROMs';
+            fullscreenBtn.textContent = isOpiumcore ? '✦ Enter Fullscreen' : '🖥️ Toggle Fullscreen';
+            resetBtn.textContent = isOpiumcore ? '✦ Reset Settings' : '🔄 Reset Settings';
+            newGameBtn.textContent = isOpiumcore ? '✦ Load New ROM' : '🔃 Load New ROM';
+            uploadBtn.textContent = isOpiumcore ? 'LOAD FILES' : 'Browse Files';
+            if (uploadIcon) uploadIcon.textContent = isOpiumcore ? '✦' : '📁';
+
+            opiumDevCard.style.display = isOpiumcore ? 'block' : 'none';
+            if (!isOpiumcore) setOpiumDevMode(false);
+            else setOpiumDevMode(localStorage.getItem('nexemu_opiumcore_devmode') === 'true');
+        }
+
+
+
+
+
+        function buildOpiumDiagnostics() {
+            return {
+                theme: document.documentElement.getAttribute('data-theme'),
+                devMode: document.body.classList.contains('opiumcore-devmode'),
+                density: densityPicker.value,
+                uiScale: uiScaleSlider.value,
+                appWidth: layoutWidthSlider.value,
+                cornerRadius: cornerRadiusSlider.value,
+                buttonShape: buttonShapePicker.value,
+                sessionStatus: sessionStatus.textContent,
+                core: coreStat.textContent,
+                uptime: sessionTimer.textContent,
+                timestamp: new Date().toISOString()
+            };
+        }
+
+
+
+
+        function renderOpiumDebugHud() {
+            if (!(document.documentElement.getAttribute('data-theme') === OPIUMCORE_THEME && document.body.classList.contains('opiumcore-devmode'))) {
+                opiumDebugHud.textContent = 'Debug HUD inactive.';
+                return;
+            }
+            const d = buildOpiumDiagnostics();
+            opiumDebugHud.textContent = [
+                'OPIUMCORE // DEV MODE',
+                `Theme: ${d.theme}`,
+                `Density: ${d.density}`,
+                `UI Scale: ${d.uiScale}%`,
+                `Layout Width: ${d.appWidth}px`,
+                `Corners: ${d.cornerRadius}px | Buttons: ${d.buttonShape}px`,
+                `Session: ${d.sessionStatus} | Core: ${d.core} | Uptime: ${d.uptime}`,
+                `Time: ${d.timestamp}`
+            ].join('\n');
+        }
+
+
+
+
+        function setOpiumDevMode(enabled) {
+            const isOpiumcore = document.documentElement.getAttribute('data-theme') === OPIUMCORE_THEME;
+            const nextEnabled = isOpiumcore && enabled;
+            document.body.classList.toggle('opiumcore-devmode', nextEnabled);
+            localStorage.setItem('nexemu_opiumcore_devmode', String(nextEnabled));
+            opiumDevChip.style.display = isOpiumcore ? 'inline-block' : 'none';
+            opiumDevChip.textContent = nextEnabled ? 'DEV MODE ON' : 'DEV MODE OFF';
+            devModeToggle.textContent = nextEnabled ? 'Disable Dev Mode' : 'Enable Dev Mode';
+            devModeStatus.textContent = nextEnabled
+                ? 'Dev mode enabled: debug HUD and grid overlay are active.'
+                : 'Dev mode is off.';
+
+            clearInterval(opiumDebugTimerId);
+            if (nextEnabled) {
+                renderOpiumDebugHud();
+                opiumDebugTimerId = setInterval(renderOpiumDebugHud, 1000);
+            } else {
+                renderOpiumDebugHud();
+            }
         }
 
 
@@ -767,25 +963,28 @@
 
 
 
-            document.documentElement.style.setProperty('--ui-radius', `${radius}px`);
-            document.documentElement.style.setProperty('--button-radius', `${buttonShape}px`);
+            const activeTheme = document.documentElement.getAttribute('data-theme');
+            const lockShapeForOpiumcore = activeTheme === OPIUMCORE_THEME;
+
+            document.documentElement.style.setProperty('--ui-radius', lockShapeForOpiumcore ? '3px' : `${radius}px`);
+            document.documentElement.style.setProperty('--button-radius', lockShapeForOpiumcore ? '0px' : `${buttonShape}px`);
             document.documentElement.style.setProperty('--ui-font', fontFamily);
             document.documentElement.style.setProperty('--ui-scale', String(uiScale));
-            document.documentElement.style.setProperty('--app-width', String(appWidth));
+            document.documentElement.style.setProperty('--app-width', lockShapeForOpiumcore ? '1540' : String(appWidth));
             document.body.classList.remove('density-comfortable', 'density-compact', 'density-condensed');
             document.body.classList.add(`density-${density}`);
 
 
 
 
-            cornerRadiusSlider.value = String(radius);
-            cornerRadiusValue.textContent = `${radius}px`;
-            buttonShapePicker.value = buttonShape;
+            cornerRadiusSlider.value = String(lockShapeForOpiumcore ? 3 : radius);
+            cornerRadiusValue.textContent = `${lockShapeForOpiumcore ? 3 : radius}px`;
+            buttonShapePicker.value = lockShapeForOpiumcore ? '0' : buttonShape;
             fontPicker.value = fontFamily;
             uiScaleSlider.value = String(uiScale);
             uiScaleValue.textContent = `${uiScale}%`;
-            layoutWidthSlider.value = String(appWidth);
-            layoutWidthValue.textContent = `${appWidth}px`;
+            layoutWidthSlider.value = String(lockShapeForOpiumcore ? 1540 : appWidth);
+            layoutWidthValue.textContent = `${lockShapeForOpiumcore ? 1540 : appWidth}px`;
             [cornerRadiusSlider, uiScaleSlider, layoutWidthSlider].forEach(updateRangeVisual);
             densityPicker.value = density;
             if (settingsOpen !== null) customizationPanel.open = settingsOpen === 'true';
@@ -955,7 +1154,13 @@
 
 
         document.getElementById('themePicker').addEventListener('change', (e) => {
-            setTheme(e.target.value);
+            const requestedTheme = e.target.value;
+            if (requestedTheme === OPIUMCORE_THEME && !unlockOpiumcoreTheme()) {
+                e.target.value = localStorage.getItem('nexemu_theme') || 'coral';
+                return;
+            }
+            setTheme(requestedTheme);
+            applyCustomizationSettings();
         });
 
 
@@ -978,7 +1183,7 @@
 
 
         document.getElementById('resetPrefs').addEventListener('click', () => {
-            ['nexemu_corner_radius', 'nexemu_button_shape', 'nexemu_font', 'nexemu_ui_scale', 'nexemu_layout_width', 'nexemu_density', 'nexemu_compact_mode', 'nexemu_settings_open', 'nexemu_theme']
+            ['nexemu_corner_radius', 'nexemu_button_shape', 'nexemu_font', 'nexemu_ui_scale', 'nexemu_layout_width', 'nexemu_density', 'nexemu_compact_mode', 'nexemu_settings_open', 'nexemu_theme', 'nexemu_opiumcore_unlocked', 'nexemu_opiumcore_devmode']
                 .forEach(key => localStorage.removeItem(key));
             setTheme('coral');
             applyCustomizationSettings();
@@ -992,7 +1197,35 @@
 
 
 
+        devModeToggle.addEventListener('click', () => {
+            const currentlyEnabled = document.body.classList.contains('opiumcore-devmode');
+            setOpiumDevMode(!currentlyEnabled);
+        });
+
+
+
+
+        copyDebug.addEventListener('click', async () => {
+            const diagnostics = JSON.stringify(buildOpiumDiagnostics(), null, 2);
+            try {
+                await navigator.clipboard.writeText(diagnostics);
+                devModeStatus.textContent = 'Diagnostics copied to clipboard.';
+            } catch {
+                devModeStatus.textContent = 'Clipboard unavailable. Diagnostics shown in debug HUD.';
+            }
+            renderOpiumDebugHud();
+        });
+
+
+
+
         cornerRadiusSlider.addEventListener('input', (e) => {
+            if (document.documentElement.getAttribute('data-theme') === OPIUMCORE_THEME) {
+                e.target.value = '3';
+                cornerRadiusValue.textContent = '3px';
+                updateRangeVisual(e.target);
+                return;
+            }
             const radius = Number(e.target.value);
             document.documentElement.style.setProperty('--ui-radius', `${radius}px`);
             cornerRadiusValue.textContent = `${radius}px`;
@@ -1004,6 +1237,11 @@
 
 
         buttonShapePicker.addEventListener('change', (e) => {
+            if (document.documentElement.getAttribute('data-theme') === OPIUMCORE_THEME) {
+                e.target.value = '0';
+                document.documentElement.style.setProperty('--button-radius', '0px');
+                return;
+            }
             document.documentElement.style.setProperty('--button-radius', `${e.target.value}px`);
             localStorage.setItem('nexemu_button_shape', e.target.value);
         });
@@ -1031,6 +1269,13 @@
 
 
         layoutWidthSlider.addEventListener('input', (e) => {
+            if (document.documentElement.getAttribute('data-theme') === OPIUMCORE_THEME) {
+                e.target.value = '1540';
+                layoutWidthValue.textContent = '1540px';
+                document.documentElement.style.setProperty('--app-width', '1540');
+                updateRangeVisual(e.target);
+                return;
+            }
             const width = Number(e.target.value);
             document.documentElement.style.setProperty('--app-width', String(width));
             layoutWidthValue.textContent = `${width}px`;
@@ -1085,6 +1330,10 @@
             }
             if (hasAltShift && key === 'r') { e.preventDefault(); document.getElementById('resetPrefs').click(); }
             if (hasAltShift && key === 'n') { e.preventDefault(); document.getElementById('newGame').click(); }
+            if (hasAltShift && key === 'd' && document.documentElement.getAttribute('data-theme') === OPIUMCORE_THEME) {
+                e.preventDefault();
+                devModeToggle.click();
+            }
             if (e.key === 'Escape' && shortcutsDialog.open) shortcutsDialog.close();
         });
 
@@ -1151,7 +1400,8 @@
         })();
 
         const savedTheme = localStorage.getItem('nexemu_theme') || 'coral';
-        setTheme(savedTheme);
+        const initialTheme = (savedTheme === OPIUMCORE_THEME && localStorage.getItem('nexemu_opiumcore_unlocked') !== 'true') ? 'coral' : savedTheme;
+        setTheme(initialTheme);
         applyCustomizationSettings();
         renderRecentRoms();
     </script>
