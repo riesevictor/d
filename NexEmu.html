@@ -30,6 +30,7 @@
             --ui-radius: 14px;
             --button-radius: 10px;
             --ui-font: 'Trebuchet MS', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --theme-font: var(--ui-font);
             --ui-scale: 100;
             --app-width: 1320;
         }
@@ -118,6 +119,16 @@
 
 
 
+        html[data-theme="opiumcore"] {
+            --bg-main: #080808; --bg-secondary: #121212; --card-bg: rgba(14,14,14,0.92);
+            --card-border: rgba(255, 255, 255, 0.18); --text-main: #f4f4f4; --text-muted: #9a9a9a;
+            --accent: #f1f1f1; --accent-strong: #8e8e8e; --accent-soft: rgba(255,255,255,0.08);
+            --theme-font: 'Impact', 'Haettenschweiler', 'Arial Narrow Bold', 'Trebuchet MS', sans-serif;
+        }
+
+
+
+
         @keyframes floatIn {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
@@ -135,7 +146,7 @@
 
 
         body {
-            font-family: var(--ui-font);
+            font-family: var(--theme-font, var(--ui-font));
             font-size: 16px;
             zoom: calc(var(--ui-scale) / 100);
             background: radial-gradient(circle at 10% -20%, color-mix(in srgb, var(--accent) 35%, transparent), transparent 42%),
@@ -474,6 +485,7 @@
                     <option value="teal">Teal</option>
                     <option value="indigo">Indigo</option>
                     <option value="rose">Rose</option>
+                    <option value="opiumcore">Opiumcore 🔒</option>
                 </select>
                 <button id="shortcutsBtn" class="ghost">⌨️ Shortcuts</button>
             </div>
@@ -662,6 +674,8 @@
         const layoutWidthValue = document.getElementById('layoutWidthValue');
         const densityPicker = document.getElementById('densityPicker');
         const customizationPanel = document.getElementById('customizationPanel');
+        const OPIUMCORE_THEME = 'opiumcore';
+        const OPIUMCORE_PASSWORD = '<3^3';
 
 
 
@@ -683,6 +697,21 @@
             document.documentElement.setAttribute('data-theme', themeName);
             document.getElementById('themePicker').value = themeName;
             localStorage.setItem('nexemu_theme', themeName);
+        }
+
+
+
+
+        function unlockOpiumcoreTheme() {
+            const unlocked = localStorage.getItem('nexemu_opiumcore_unlocked') === 'true';
+            if (unlocked) return true;
+            const entered = window.prompt('Opiumcore is locked. Enter the theme password:');
+            if (entered === OPIUMCORE_PASSWORD) {
+                localStorage.setItem('nexemu_opiumcore_unlocked', 'true');
+                return true;
+            }
+            if (entered !== null) window.alert('Wrong password. Opiumcore theme stayed locked.');
+            return false;
         }
 
 
@@ -955,7 +984,12 @@
 
 
         document.getElementById('themePicker').addEventListener('change', (e) => {
-            setTheme(e.target.value);
+            const requestedTheme = e.target.value;
+            if (requestedTheme === OPIUMCORE_THEME && !unlockOpiumcoreTheme()) {
+                e.target.value = localStorage.getItem('nexemu_theme') || 'coral';
+                return;
+            }
+            setTheme(requestedTheme);
         });
 
 
@@ -978,7 +1012,7 @@
 
 
         document.getElementById('resetPrefs').addEventListener('click', () => {
-            ['nexemu_corner_radius', 'nexemu_button_shape', 'nexemu_font', 'nexemu_ui_scale', 'nexemu_layout_width', 'nexemu_density', 'nexemu_compact_mode', 'nexemu_settings_open', 'nexemu_theme']
+            ['nexemu_corner_radius', 'nexemu_button_shape', 'nexemu_font', 'nexemu_ui_scale', 'nexemu_layout_width', 'nexemu_density', 'nexemu_compact_mode', 'nexemu_settings_open', 'nexemu_theme', 'nexemu_opiumcore_unlocked']
                 .forEach(key => localStorage.removeItem(key));
             setTheme('coral');
             applyCustomizationSettings();
@@ -1151,7 +1185,8 @@
         })();
 
         const savedTheme = localStorage.getItem('nexemu_theme') || 'coral';
-        setTheme(savedTheme);
+        const initialTheme = (savedTheme === OPIUMCORE_THEME && localStorage.getItem('nexemu_opiumcore_unlocked') !== 'true') ? 'coral' : savedTheme;
+        setTheme(initialTheme);
         applyCustomizationSettings();
         renderRecentRoms();
     </script>
